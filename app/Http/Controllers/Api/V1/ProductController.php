@@ -13,12 +13,11 @@ class ProductController extends Controller
      * Display a listing of the resource.
      *
      * @param  \App\Repositories\Product  $repository
-     * @param  int $pageSize
      * @return \Illuminate\Http\Response
      */
-    public function index(Product $repository, $pageSize = 10)
+    public function index(Product $repository)
     {
-        return $repository->list($pageSize);
+        return $repository->list();
     }
 
     /**
