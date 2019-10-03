@@ -29,7 +29,6 @@ class CreateProductsTable extends Migration
             $table->integer('stock');
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['name', 'brand']);
         });
     }
 
