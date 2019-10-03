@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Product;
-use App\Requests\Product\StoreRequest;
-use App\Requests\Product\UpdateRequest;
-use App\Requests\Product\SearchRequest;
+use App\Models\ProductType;
+use App\Http\Requests\Product\StoreRequest;
+use App\Http\Requests\Product\UpdateRequest;
 use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
@@ -15,19 +15,9 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Product $product)
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $product->applyFilters()->applySort()->paginate(10);
     }
 
     /**
@@ -36,9 +26,18 @@ class ProductController extends Controller
      * @param  \App\Requests\Product\StoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request, Product $product, ProductType $type)
     {
-        //
+        //Set product type relation
+        $type = $type->firstOrCreate(['name' => $request->input('type')]);
+        $product->type()->associate($type);
+
+        //Fill all attributes
+        $product = $product->fill($request->all());
+
+        $product->save();
+
+        return $product;
     }
 
     /**
@@ -49,18 +48,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-        //
+        return $product;
     }
 
     /**
@@ -70,9 +58,15 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Product $product)
+    public function update(UpdateRequest $request, Product $product, ProductType $type)
     {
-        //
+        //Set product type relation if needs
+        if($request->has('type')) {
+            $type = $type->firstOrCreate(['name' => $request->input('type')]);
+            $product->type()->associate($type);
+        }
+
+        return $product->update($request->all()) ? $product : 404;
     }
 
     /**
@@ -83,18 +77,6 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
-    }
-
-    /**
-     * Searches model by the giving filter.
-     *
-     * @param  \App\Resources\Product\SearchRequest  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function search(SearchRequest $request, Product $product)
-    {
-        //
+        return $product->delete() ? 204 : 404;
     }
 }
