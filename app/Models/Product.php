@@ -48,6 +48,7 @@ class Product extends Model
      * @var array
      */
     protected $visible = [
+        'id',
         'name',
         'type',
         'brand',
