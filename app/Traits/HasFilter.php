@@ -70,7 +70,7 @@ trait HasFilter
                 continue;
             }
 
-            return $builder->where($field[0], 'like',  "%$field[1]%");
+            $builder->where($field[0], 'like',  "%$field[1]%");
         }
 
         return $builder;
