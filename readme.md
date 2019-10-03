@@ -27,10 +27,75 @@ Now, let's save all changes at cache.
 ```bash
 php artisan config:cache
 ```
-
+For create migrations run and populate a faker database.
+```bash
+php artisan migrate
+php artisan db:seed
+```
+Finally, start the server
+```bash
+php artisan serve
+```
 ## Usage
+For all requests, we need to pass the parameter `api_token` for user authentication.
 
+All faker users are configurated with:
+`api_token=kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS`
 
+## Available routes
+
+ **List all products**
+ ```bash
+GET  /api/v1/products
+ ```
+*Advanced Search*
+
+You can use advanced search like:
+`?q=seringa&filter=brand:BUNZL,stock:340&sort=name:asc,created_at:desc`
+
+*Pagination*
+
+For change the page result, use:
+
+    page=3
+
+ **Show product**
+  ```bash
+GET  /api/v1/products/{$id}
+ ```
+  **Create Product**
+
+  Use `enctype=multipart/form-data`
+  ```bash
+POST  /api/v1/products
+ ```
+ *Parameters*
+
+| Name | Description | Type |
+|--|--|--|
+| name | The product name. Eg: "Estetoscópio Littmann Classic III Black Edition" | required |
+| type | The product type. Eg: "estetoscopio, seringa, luva"|  required |
+| brand | The brand of the product. Eg: "BUNZL"|  required |
+| stock | The quantity of the product in stock. Eg: "30"|  required |
+| amount | The price of the product. Eg: "759.90"|  required |
+
+ **Update product**
+
+Use `enctype=application/x-www-form-urlencoded`
+  ```bash
+PUT  /api/v1/products/{$id}
+ ```
+
+*Parameters*
+
+| Name | Description | Type |
+|--|--|--|
+| id | The product id. Eg: "18" | required |
+| name | The product name. Eg: "Estetoscópio Littmann Classic III Black Edition" | optional |
+| type | The product type. Eg: "estetoscopio, seringa, luva"|  optional |
+| brand | The brand of the product. Eg: "BUNZL"|  optional |
+| stock | The quantity of the product in stock. Eg: "30"|  optional |
+| amount | The price of the product. Eg: "759.90"|  optional |
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
