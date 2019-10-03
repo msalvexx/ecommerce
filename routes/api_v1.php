@@ -14,4 +14,3 @@ use Illuminate\Http\Request;
 */
 
 Route::apiResource('products', 'ProductController');
-Route::get('products', 'ProductController@Search');
