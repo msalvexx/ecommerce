@@ -13,9 +13,23 @@ class CreateProductsTable extends Migration
      */
     public function up()
     {
+        Schema::create('product_types', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name')->unique();
+            $table->timestamps();
+        });
+
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('product_type_id');
+            $table->foreign('product_type_id')->references('id')->on('product_types');
+            $table->string('name');
+            $table->string('brand');
+            $table->decimal('amount', 9, 2);
+            $table->integer('stock');
             $table->timestamps();
+            $table->softDeletes();
+            $table->unique(['name', 'brand']);
         });
     }
 
