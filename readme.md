@@ -1,7 +1,7 @@
 
-# Ecommerce Test Project
+# VS Challenger
 
-A test project for Veus Tecnology.
+A project of Veus Tecnology Challenger.
 
 ## Installation
 
