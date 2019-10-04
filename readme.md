@@ -1,4 +1,5 @@
 
+
 # VS Challenger
 
 A project of Veus Tecnology Challenger.
@@ -23,10 +24,6 @@ Run the following code to set the application key.
 ```bash
 php artisan key:generate
 ```
-Now, let's save all changes at cache.
-```bash
-php artisan config:cache
-```
 For create migrations run and populate a faker database.
 ```bash
 php artisan migrate
@@ -36,6 +33,9 @@ Finally, start the server
 ```bash
 php artisan serve
 ```
+
+Generally, the project will be available in route http://localhost:8000.
+
 ## Usage
 For all requests, we need to pass the parameter `api_token` for user authentication.
 
@@ -96,6 +96,12 @@ PUT  /api/v1/products/{$id}
 | brand | The brand of the product. Eg: "BUNZL"|  optional |
 | stock | The quantity of the product in stock. Eg: "30"|  optional |
 | amount | The price of the product. Eg: "759.90"|  optional |
+
+## Testing
+
+Just run the following code on terminal:
+
+    npm run phpunit
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
