@@ -17,7 +17,7 @@ class ProductController extends Controller
      */
     public function index(Product $repository)
     {
-        return $repository->list();
+        return response()->json($repository->list(), 200);
     }
 
     /**
@@ -29,7 +29,7 @@ class ProductController extends Controller
      */
     public function store(StoreRequest $request, Product $repository)
     {
-        return $repository->create($request->all());
+        return response()->json($repository->create($request->all()), 201);
     }
 
     /**
@@ -54,8 +54,8 @@ class ProductController extends Controller
      */
     public function update(UpdateRequest $request, Product $repository, $id)
     {
-        $repository = $repository->update($id, $request->all());
-        return $repository ? $repository : 404;
+        $response = $repository->update($id, $request->all());
+        return response()->json($response, 200);
     }
 
     /**
