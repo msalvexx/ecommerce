@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use App\Traits\HasCategoryFilter;
+use App\Traits\HasFilter;
+use App\Traits\IsSortable;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -32,8 +35,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
-
         parent::boot();
     }
 
@@ -79,5 +80,25 @@ class RouteServiceProvider extends ServiceProvider
              ->name('api.v1.')
              ->namespace($this->apiNamespace . "\V1")
              ->group(base_path('routes/api_v1.php'));
+    }
+
+     /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        HasCategoryFilter::categoryResolver(function () {
+            return request()->query('q');
+        });
+
+        HasFilter::filterResolver(function () {
+            return request()->query('filter');
+        });
+
+        IsSortable::sortResolver(function () {
+            return request()->query('sort');
+        });
     }
 }
