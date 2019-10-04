@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Arr;
 use Artisan;
@@ -43,15 +41,46 @@ class ProductTest extends TestCase
     ];
 
     /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
-    protected function setUp(): void
+    * Test unauthorized list.
+    *
+    * @return void
+    */
+   public function testDatabase()
     {
-        parent::setUp();
+        print "\nCreating database for testing.\n";
+
         Artisan::call('migrate:fresh');
         Artisan::call('db:seed');
+
+        $this->assertDatabaseHas('users', [
+            'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS'
+        ]);
+
+        $this->assertDatabaseHas('product_types', [
+            'name' => 'seringa'
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'name' => 'Balanca 1',
+            'stock' => 25,
+            'amount' => 199.90,
+            'created_at' => '2019-10-03 17:00:00',
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'name' => 'Aparelho de Pressao 1',
+            'created_at' => '2019-10-03 17:00:00',
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'name' => 'Aparelho de Pressao 1',
+            'created_at' => '2019-10-03 16:00:00',
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'product_type_id' => 17,
+            'stock' => 310,
+        ]);
     }
 
     /**
@@ -61,14 +90,14 @@ class ProductTest extends TestCase
      */
     public function testUnauthorized()
     {
+        print "\nTesting authentication.\n";
+
         //check unauthorized
         $withoutApiToken = $this->json('GET', route('api.v1.products.index'));
 
         $withoutApiToken
             ->assertJson(['message' => 'Unauthenticated.'], 'Checking user unauthorized.')
             ->assertStatus(401, 'Checking status code.');
-
-        print "\nTesting authentication.\n";
     }
 
 
@@ -79,6 +108,8 @@ class ProductTest extends TestCase
      */
     public function testSimpleSearch()
     {
+        print "\nTesting index route.\n";
+
         //without search parameters
         $parameters = [
             'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS'
@@ -94,8 +125,33 @@ class ProductTest extends TestCase
             [
                 'total' => 50
             ]);
+    }
 
-        print "\nTesting index route.\n";
+    /**
+     * Test simple search.
+     *
+     * @return void
+     */
+    public function testChangePage()
+    {
+        print "\nTesting index route with change page.\n";
+
+        //without search parameters
+        $parameters = [
+            'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS',
+            'page' => 3
+        ];
+
+        $simpleSearch = $this->withHeaders(['Accept' => 'application/json'])
+                            ->json('GET', route('api.v1.products.index', $parameters));
+
+        //check returned all products
+        $simpleSearch
+            ->assertStatus(200)
+            ->assertJsonFragment(
+            [
+                'current_page' => 3
+            ]);
     }
 
     /**
@@ -105,6 +161,8 @@ class ProductTest extends TestCase
      */
     public function testTypeSearch()
     {
+        print "\nTesting index route with type search.\n";
+
         //with type search
         $parameters = [
             'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS',
@@ -127,10 +185,8 @@ class ProductTest extends TestCase
                 $isCorrectType = false;
             }
         }
-        $this
-            ->assertTrue($isCorrectType);
 
-        print "\nTesting index route with type search.\n";
+        $this->assertTrue($isCorrectType);
     }
 
     /**
@@ -140,6 +196,8 @@ class ProductTest extends TestCase
      */
     public function testFilterSearch()
     {
+        print "\nTesting index route with filter search.\n";
+
         //with type search
         $parameters = [
             'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS',
@@ -163,10 +221,8 @@ class ProductTest extends TestCase
                 $isCorrectFiltered = false;
             }
         }
-        $this
-            ->assertTrue($isCorrectFiltered);
 
-        print "\nTesting index route with filter search.\n";
+        $this->assertTrue($isCorrectFiltered);
     }
 
     /**
@@ -176,6 +232,8 @@ class ProductTest extends TestCase
      */
     public function testSortList()
     {
+        print "\nTesting index route with sort.\n";
+
         //with type search
         $parameters = [
             'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS',
@@ -203,8 +261,6 @@ class ProductTest extends TestCase
 
         $this->assertTrue($namesIsCorrect);
         $this->assertTrue($creationDateIsCorrect);
-
-        print "\nTesting index route with sort.\n";
     }
 
     /**
@@ -214,6 +270,8 @@ class ProductTest extends TestCase
      */
     public function testSearchWrongParameters()
     {
+        print "\nTesting index route with wrong parameters.\n";
+
         //with type search
         $parameters =  [
             'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS',
@@ -240,10 +298,8 @@ class ProductTest extends TestCase
                 $isCorrectFiltered = false;
             }
         }
-        $this
-            ->assertTrue($isCorrectFiltered);
 
-        print "\nTesting index route with wrong parameters.\n";
+        $this->assertTrue($isCorrectFiltered);
     }
 
     /**
@@ -253,6 +309,8 @@ class ProductTest extends TestCase
      */
     public function testFindRoute()
     {
+        print "\nTesting find route.\n";
+
         $parameters =  [
             'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS',
             'id'        => 1
@@ -264,8 +322,6 @@ class ProductTest extends TestCase
 
         $passingWrongParameters
             ->assertStatus(200);
-
-        print "\nTesting find route.\n";
     }
 
     /**
@@ -275,6 +331,8 @@ class ProductTest extends TestCase
      */
     public function testCreateRoute()
     {
+        print "\nTesting create route.\n";
+
         $parameters =  [
             'api_token' => 'kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS',
         ];
@@ -302,8 +360,6 @@ class ProductTest extends TestCase
                 'stock'  =>  350,
                 'amount' =>  759.90
             ]);
-
-        print "\nTesting create route.\n";
     }
 
     /**
@@ -313,6 +369,8 @@ class ProductTest extends TestCase
      */
     public function testUpdateRoute()
     {
+        print "\nTesting update route.\n";
+
         $body = [
             'name' => 'teste',
             'brand' => 'BUNZL',
@@ -332,8 +390,6 @@ class ProductTest extends TestCase
                     'name' => 'luva'
                 ]
             ]);
-
-        print "\nTesting update route.\n";
     }
 
     /**
@@ -343,13 +399,13 @@ class ProductTest extends TestCase
      */
     public function testDeleteRoute()
     {
+        print "\nTesting delete route.\n";
+
         $passingWrongParameters = $this
             ->withHeaders(['Accept' => 'application/json'])
             ->json("delete", route('api.v1.products.index')."/28?api_token=kxBDR7b01xC4VNg2o97F5SSs4XCcJyn9y6dxkaYkwF5odjeL9OpQDAMjW7cS");
 
         $passingWrongParameters
             ->assertStatus(204);
-
-        print "\nTesting delete route.\n";
     }
 }
